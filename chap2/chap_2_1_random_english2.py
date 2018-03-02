@@ -49,8 +49,23 @@ noun => man | ball | woman | table
 Article => the | a
 """
 
-grammer = convert_grammar(more_complicated_grammar)
-print(grammer)
+complicated_grammar = """
+sentence => noun-phrase verb-phrase
+noun-phrase => Article Adj* Noun PP* | Name | Pron
+verb-phrase => Verb noun-phrase PP*
+PP* => null | PP PP*
+Adj* => null | Adj Adj*
+PP => Prep noun-phrase
+Prep => to | in | by | with | on
+Adj => big | little | blue | green | adiabatic
+Article => the | a 
+Name => Pat | Kim | Lee | Terry | Robin
+Noun => man | ball | woman | table
+Verb => hit | took | saw | liked
+Pron => he | she | it | these | those | that
+"""
+
+grammer = convert_grammar(complicated_grammar)
 
 
 def rewrites(category):
