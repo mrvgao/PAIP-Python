@@ -11,18 +11,8 @@ Prep => to, in, by, win
 the simple function will not work for this.
 """
 import random
-from functools import reduce
-
-
-def mappend(func, elements):
-    return reduce(lambda a, b: a + b, map(func, elements))
-
-
-def assoc(key, lists):
-    for l in lists:
-        if len(lists) >= 1 and l[0] == key: return l
-    else:
-        return None
+from utilities import mappend
+from utilities import assoc
 
 
 simple_grammar = [
