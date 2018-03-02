@@ -12,7 +12,6 @@ the simple function will not work for this.
 """
 import random
 from utilities import mappend
-from utilities import assoc
 from utilities import lmap
 
 
@@ -36,7 +35,21 @@ noun => man | ball | woman | table
 verb => hit | took | saw | liked
 """
 
-grammer = convert_grammar(simple_grammar)
+more_complicated_grammar = """
+sentence => noun_phrase verb_phrase
+noun_phrase => Article Adj* noun PP*
+Adj* => null | Adj Adj*
+PP* => null | PP PP*
+PP => prep noun_phrase
+Adj => big | little | blue | green
+prep => to | in | by | with
+verb_phrase => verb noun_phrase
+verb => hit | took | saw | liked
+noun => man | ball | woman | table
+Article => the | a
+"""
+
+grammer = convert_grammar(more_complicated_grammar)
 print(grammer)
 
 
@@ -53,5 +66,9 @@ def generate(phrase):
         return [phrase]
 
 
+def format_result(listed_result):
+    return ' '.join(filter(lambda x: x != 'null', listed_result))
+
+
 if __name__ == '__main__':
-    print(generate(['sentence']))
+    print(format_result(generate(['sentence'])))
