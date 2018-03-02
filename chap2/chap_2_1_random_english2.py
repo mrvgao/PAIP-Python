@@ -81,9 +81,18 @@ def generate(phrase):
         return generate(random.choices(rewrites(phrase)))
 
 
+def generate_tree(phrase):
+    if isinstance(phrase, list):
+        return mappend(generate_tree, phrase)
+    elif phrase not in grammer:
+        return [phrase]
+    else:
+        return [[phrase] + generate_tree(random.choices(rewrites(phrase)))]
+
+
 def format_result(listed_result):
     return ' '.join(filter(lambda x: x != 'null', listed_result))
 
 
 if __name__ == '__main__':
-    print(format_result(generate(['sentence'])))
+    print(generate_tree(['sentence']))
