@@ -13,6 +13,7 @@ the simple function will not work for this.
 import random
 from utilities import mappend
 from utilities import lmap
+from collections import defaultdict
 
 
 def convert_grammar(grammar):
@@ -94,5 +95,15 @@ def format_result(listed_result):
     return ' '.join(filter(lambda x: x != 'null', listed_result))
 
 
+def format_tree_result(tree_result):
+    if not isinstance(tree_result, list): return tree_result
+    else:
+        root = tree_result[0]
+        tree_syntax = defaultdict(list)
+        for sub_tree in tree_result[1:]:
+            tree_syntax[root].append(format_tree_result(sub_tree))
+        return dict(tree_syntax)
+
+
 if __name__ == '__main__':
-    print(generate_tree(['sentence']))
+    print(format_tree_result(generate_tree(['sentence'])[0]))
