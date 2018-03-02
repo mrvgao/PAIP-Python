@@ -60,10 +60,10 @@ def rewrites(category):
 def generate(phrase):
     if isinstance(phrase, list):
         return mappend(generate, phrase)
-    elif rewrites(phrase):
-        return generate(random.choices(rewrites(phrase)))
-    else:
+    elif phrase not in grammer:
         return [phrase]
+    else:
+        return generate(random.choices(rewrites(phrase)))
 
 
 def format_result(listed_result):
