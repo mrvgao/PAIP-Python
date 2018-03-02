@@ -13,30 +13,35 @@ the simple function will not work for this.
 import random
 from utilities import mappend
 from utilities import assoc
+from utilities import lmap
 
 
-simple_grammar = [
-    ['sentence', '->', ['noun_phrase', 'verb_phrase']],
-    ['noun_phrase', '->', ['Article', 'noun']],
-    ['verb_phrase', '->', ['verb', 'noun_phrase']],
-    ['Article', '->', 'the', 'a'],
-    ['noun', '->', 'man', 'ball', 'woman', 'table'],
-    ['verb', '->', 'hit', 'took', 'saw', 'liked']
-]
+def convert_grammar(grammar):
+    dict_grammar = {}
+    for line in grammar.split('\n'):
+        if not line: continue
+        left, right = line.split('=>')
+        right = lmap(lambda rule: rule.split(), right.split('|'))
+        dict_grammar[left.strip()] = right
 
-grammer = simple_grammar
-
-
-def rule_lhs(rule): return rule[0]
+    return dict_grammar
 
 
-def rule_rhs(rule): return rule[2:]
+simple_grammar = """
+sentence => noun_phrase verb_phrase
+noun_phrase => Article noun
+verb_phrase => verb noun_phrase
+Article => the | a
+noun => man | ball | woman | table
+verb => hit | took | saw | liked
+"""
+
+grammer = convert_grammar(simple_grammar)
+print(grammer)
 
 
 def rewrites(category):
-    rewrite_elements = assoc(category, grammer)
-    if rewrite_elements: return rule_rhs(rewrite_elements)
-    else: return None
+    return grammer.get(category, None)
 
 
 def generate(phrase):
