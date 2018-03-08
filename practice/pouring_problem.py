@@ -22,7 +22,7 @@ def find_goal(X, Y, goal, start=(0, 0)):
     if goal in start:
         return [start]
 
-    pathes = [[('init', start)]]
+    pathes = [ [('init', start)] ]
     visited = set()
 
     while pathes:
@@ -44,7 +44,7 @@ def find_goal(X, Y, goal, start=(0, 0)):
 
 
 print(get_successor(9, 4, 9, 4))
-solution = find_goal(9, 4, 6)
+solution = find_goal(123, 23, 6)
 
 for s, c in solution:
     print(s, c)
