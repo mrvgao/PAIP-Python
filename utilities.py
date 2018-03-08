@@ -20,4 +20,6 @@ def assoc(key, lists):
         return None
 
 
+def combine_all(xlist, ylist):
+    return [[x, y] for x in xlist for y in ylist]
 

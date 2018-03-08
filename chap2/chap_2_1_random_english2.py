@@ -29,11 +29,13 @@ def convert_grammar(grammar):
 
 simple_grammar = """
 sentence => noun_phrase verb_phrase
-noun_phrase => Article noun
+noun_phrase => Article Adj* noun
+Adj* => null | Adj Adj*
 verb_phrase => verb noun_phrase
-Article => the | a
-noun => man | ball | woman | table
-verb => hit | took | saw | liked
+Article => 这个 | 一个
+noun => 男人 | 篮球 | 女人 | 桌子
+verb => 打 | 拿 | 看见 | 喜欢
+Adj => 黑色的 | 蓝色的 | 漂亮的 | 坚固的
 """
 
 more_complicated_grammar = """
@@ -66,7 +68,7 @@ Verb => hit | took | saw | liked
 Pron => he | she | it | these | those | that
 """
 
-grammer = convert_grammar(complicated_grammar)
+grammer = convert_grammar(simple_grammar)
 
 
 def rewrites(category):
@@ -88,7 +90,7 @@ def generate_tree(phrase):
     elif phrase not in grammer:
         return [phrase]
     else:
-        return [[phrase] + generate_tree(random.choices(rewrites(phrase)))]
+        return [phrase] + generate_tree(random.choices(rewrites(phrase)))
 
 
 def format_result(listed_result):
@@ -106,4 +108,4 @@ def format_tree_result(tree_result):
 
 
 if __name__ == '__main__':
-    print(format_tree_result(generate_tree(['sentence'])[0]))
+    print((format_result(generate(['sentence']))))
