@@ -62,7 +62,7 @@ def gps(inital_states, goal_states, operators):
         path = pathes.pop(0)
         froniter_action, froniter_state = path[-1]
 
-        if set(froniter_state) in visited: continue
+        if tuple(froniter_state) in visited: continue
 
         for action, state in get_successor(froniter_state, operators).items():
             p = path + [(action, state)]
@@ -77,14 +77,22 @@ def gps(inital_states, goal_states, operators):
 
 def get_solution(start_states, goal_states):
     solutions = (gps(start_states, goal_states, school_operators))
-    for s in solutions:
-        print(s)
+    if solutions:
+        for s in solutions:
+            print(s)
+    else:
+        print('None')
 
 
-# get_solution({'son-at-home', 'car-needs-battery', 'have-money', 'have-phone-book'},
-#              {'son-at-school'})
+get_solution({'son-at-home', 'car-needs-battery', 'have-money', 'have-phone-book'},
+             {'son-at-school'})
+
+print('-----------------')
 
 get_solution({'son-at-home', 'car-needs-battery', 'have-money'},
              {'son-at-school'})
 
+print('-----------------')
 
+get_solution({'son-at-home', 'car-works'},
+             {'son-at-school'})
