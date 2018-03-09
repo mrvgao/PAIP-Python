@@ -23,3 +23,10 @@ def assoc(key, lists):
 def combine_all(xlist, ylist):
     return [[x, y] for x in xlist for y in ylist]
 
+
+def first_if(array, cond):
+    for a in array:
+        if cond(a): return a
+    else:
+        return None
+

@@ -48,6 +48,3 @@ solution = find_goal(123, 23, 6)
 
 for s, c in solution:
     print(s, c)
-
-
-
