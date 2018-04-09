@@ -30,3 +30,9 @@ def first_if(array, cond):
     else:
         return None
 
+
+def cond_all(cond, iterables):
+    return all(cond(e) for e in iterables)
+
+
+assert cond_all(lambda x: x > 0, [1, 2, 3])
