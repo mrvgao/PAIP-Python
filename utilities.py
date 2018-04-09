@@ -31,8 +31,8 @@ def first_if(array, cond):
         return None
 
 
-def cond_all(cond, iterables):
+def every(cond, iterables):
     return all(cond(e) for e in iterables)
 
 
-assert cond_all(lambda x: x > 0, [1, 2, 3])
+assert every(lambda x: x > 0, [1, 2, 3])
