@@ -35,4 +35,22 @@ def every(cond, iterables):
     return all(cond(e) for e in iterables)
 
 
+def assoc(var, alist):
+    for a in alist:
+        try:
+            if a[0] == var: return a
+        except TypeError as e:
+            pass
+        except IndexError as e:
+            pass
+    return None
+
+
+if __name__ == '__main__':
+    assert assoc(1, [(1, 1), (2, 2)]) == (1, 1)
+    assert assoc(3, [(1, 1), (2, 2)]) is None
+    print('test done!')
+
+
+
 assert every(lambda x: x > 0, [1, 2, 3])
