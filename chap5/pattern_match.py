@@ -1,6 +1,3 @@
-from functools import reduce
-import operator as op
-from utilities import assoc
 from collections import defaultdict
 
 
@@ -50,31 +47,36 @@ def pattern_match_l_buggy(pattern, input):
         return pattern_match_l_buggy(pattern[0], input[0]) + pattern_match_l_buggy(pattern[1:], input[1:])
 
 
-no_binding = defaultdict(lambda : None)
 fail = [True, None]
 
 
-def pattern_match_l(pattern, input, bindings=no_binding):
+def pattern_match_l(pattern, input, bindings=None):
+    bindings = bindings or defaultdict(lambda : None)
     if bindings == fail: return None
     elif is_variable(pattern):
         return match_variable(pattern, input, bindings)
-    elif pattern == input:
-        return bindings
-    elif isinstance(pattern, list) and isinstance(input, list):
-        return pattern_match_l(pattern[1:], input[1:], pattern_match_l(pattern[0], input[0]))
+    elif is_atom(pattern):
+        if pattern == input: return bindings
+        else: return fail
+    elif is_tokens(pattern) and is_tokens(input):
+        peak_p, peak_input = pattern[0], input[0] if len(pattern) > 1 else ' '.join(input[0:])
+        return pattern_match_l(pattern[1:], input[1:],
+                               bindings=pattern_match_l(peak_p, peak_input, bindings=bindings)
+                )
     else:
-        return fail
+        return bindings
+
+
+def is_tokens(p_tokens):
+    return isinstance(p_tokens, list) and len(p_tokens) > 0
 
 
 def match_variable(var, input, bindings):
-    binding_val = get_binding_val(var, bindings)
-
-    if binding_val is None:
-        return extend_bindings(var, input, bindings)
-    elif input == binding_val:
-        return bindings
-    else:
-        return fail
+    if bindings[var] is None:
+        bindings[var] = input
+    elif bindings[var] != input:
+        bindings = fail
+    return bindings
 
 
 def sub_list(variable_subsitude, words):
@@ -82,12 +84,29 @@ def sub_list(variable_subsitude, words):
     return [w if w != variable else subsitude for w in words]
 
 
-print(sub_list(('?X', 'vacation'),
-               'what would it mean to you if you got a ?X ?'.split()))
+def get_bindings_pair(bindings_dict):
+    return bindings_dict.items()
+
 
 assert pattern_match(test_pattern.split(), test_input.split())
 assert not pattern_match(test_pattern.split(), test_n_input.split())
+assert pattern_match_l('I need a ?X a really ?X'.split(), 'I need a vacation a really trip'.split()) is None
+assert pattern_match_l('I need a ?X a really ?X'.split(), 'I need a vacation a really ?X'.split()) is None
+assert dict(pattern_match_l('I need a ?X a really ?X'.split(), 'I need a vacation a really vacation'.split())) == {'?X': 'vacation'}
+assert pattern_match_l('?X a really ?X'.split(), 'vacation a really ?X'.split()) is None
+assert ' '.join(sub_list(
+    *get_bindings_pair(
+        pattern_match_l('I need a ?X a really ?X'.split(),
+                        'I need a vacation a really vacation'.split())),
+    'what would it mean to you if you got a ?X ?'.split())) == \
+    'what would it mean to you if you got a vacation ?'
+
+assert dict(pattern_match_l('?X is ?X'.split(), '2 is 2'.split())) == {'?X': '2'}
+assert pattern_match_l('?X is ?X'.split(), '2 + 2 is 4'.split()) is None
+assert pattern_match_l(['?X', 'is', '?X'], ['2 + 2', 'is', '4']) is None
+assert dict(pattern_match_l(['?X', 'is', '?X'], ['2 + 2', 'is', '2 + 2'])) == {'?X': '2 + 2'}
+
+r = pattern_match_l(['?P', 'need', '?X'], ['I', 'need', 'a', 'long', 'trip'])
+assert dict(r) == {'?P': 'I', '?X': 'a long trip'}, dict(r)
 print('test done!')
 
-print(pattern_match_l('I need a ?X a really ?X'.split(), 'I need a vacation a really trip'.split()))
-print(pattern_match_l('I need a ?X a really ?X'.split(), 'I need a vacation a really ?X'.split()))
