@@ -58,6 +58,8 @@ def pattern_match_l(pattern, input, bindings=None):
     elif is_atom(pattern):
         if pattern == input: return bindings
         else: return fail
+    elif is_segment_pattern(pattern):
+        return segment_match(pattern, input, bindings)
     elif is_tokens(pattern) and is_tokens(input):
         peak_p, peak_input = pattern[0], input[0] if len(pattern) > 1 else ' '.join(input[0:])
         return pattern_match_l(pattern[1:], input[1:],
@@ -67,8 +69,35 @@ def pattern_match_l(pattern, input, bindings=None):
         return bindings
 
 
+def is_segment_pattern(pattern):
+    return is_tokens(pattern) and isinstance(pattern[0], tuple) and pattern[0][0].startswith('?*')
+
+
 def is_tokens(p_tokens):
     return isinstance(p_tokens, list) and len(p_tokens) > 0
+
+
+def segment_match(pattern, input, bindings=None, start=0):
+    bindings = bindings or defaultdict(lambda : None)
+    var = pattern[0][1]
+    pat = pattern[1:]
+
+    if len(pat) == 0:
+        return match_variable(var, input, bindings)
+    else:
+        pos = input[start:].index(pat[0]) if pat[0] in input[start:] else None
+        if pos is None:
+            return fail
+        else:
+            b2 = pattern_match_l(pat, input[start+pos:], bindings)
+            if b2 is None or b2 == fail:
+                return segment_match(pattern, input, bindings, start=pos+1)
+                # when pattern_match_l for (pat, input[pos:], bindings) is None
+                # which means, the candidate suite match for mark after segment mark ?*
+                # is not fit for the total sub-pattern, then, we could let this be the ?* part
+                # and move forward to test if further sequence is okay.
+            else:
+                return match_variable(var, input[:start+pos], bindings=b2)
 
 
 def match_variable(var, input, bindings):
@@ -108,5 +137,15 @@ assert dict(pattern_match_l(['?X', 'is', '?X'], ['2 + 2', 'is', '2 + 2'])) == {'
 
 r = pattern_match_l(['?P', 'need', '?X'], ['I', 'need', 'a', 'long', 'trip'])
 assert dict(r) == {'?P': 'I', '?X': 'a long trip'}, dict(r)
+
+r = pattern_match_l([('?*', '?P'), 'need', ('?*', '?X')], ['Mr', 'Hulot', 'and', 'I', 'need', 'a', 'vacation'])
+assert dict(r) == {'?P': ['Mr', 'Hulot', 'and', 'I'], '?X': ['a', 'vacation']}, dict(r)
+
+r = pattern_match_l([('?*', '?x'), 'is', 'a', ('?*', '?y')],
+                    ['what', 'he', 'is', 'is', 'a', 'fool'])
+assert dict(r) == {'?x': ['what', 'he', 'is'],
+                   '?y': ['fool']}, dict(r)
+
 print('test done!')
+
 
