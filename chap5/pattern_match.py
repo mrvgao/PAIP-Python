@@ -89,15 +89,17 @@ def segment_match(pattern, input, bindings=None, start=0):
         if pos is None:
             return fail
         else:
-            b2 = pattern_match_l(pat, input[start+pos:], bindings)
+            match_bindings = match_variable(var, input[:pos+start], bindings)
+            b2 = pattern_match_l(pat, input[start+pos:], match_bindings)
             if b2 is None or b2 == fail:
+                bindings = defaultdict(lambda : None)
                 return segment_match(pattern, input, bindings, start=pos+1)
                 # when pattern_match_l for (pat, input[pos:], bindings) is None
                 # which means, the candidate suite match for mark after segment mark ?*
                 # is not fit for the total sub-pattern, then, we could let this be the ?* part
                 # and move forward to test if further sequence is okay.
             else:
-                return match_variable(var, input[:start+pos], bindings=b2)
+                return b2
 
 
 def match_variable(var, input, bindings):
@@ -145,6 +147,10 @@ r = pattern_match_l([('?*', '?x'), 'is', 'a', ('?*', '?y')],
                     ['what', 'he', 'is', 'is', 'a', 'fool'])
 assert dict(r) == {'?x': ['what', 'he', 'is'],
                    '?y': ['fool']}, dict(r)
+
+r = pattern_match_l([('?*', '?x'), 'a', 'b', ('?*', '?x')],
+                    '1 2 a b a b 1 2 a b'.split())
+assert dict(r) == {'?x': ['1', '2', 'a', 'b']}, dict(r)
 
 print('test done!')
 
