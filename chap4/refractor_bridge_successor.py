@@ -22,32 +22,28 @@ def bsuccessors3(state):
     where here and there are frozen sets of people, light is 0 if the light is
     on the here side and 1 if it is on the there side.
     Action is a tuple (travelers, arrow) where arrow is '->' or '<-'"""
-    here, there, light = state
-    here_there = (here, there)
+    _, _, light = state
     here_op, there_op, action = (op.sub, op.or_, '->') if light == 0 else (op.or_, op.sub, '<-')
 
-    return {
-        (here_op(here, frozenset([a, b])), there_op(there, frozenset([a, b])), 1-light): (set([a, b]), action)
-        for a in here_there[light]
-        for b in here_there[light]
-
-    }
+    return {(here_op(state[0], frozenset([a, b])), there_op(state[1], frozenset([a, b])), 1-light): (set([a, b]), action)
+            for a in state[light]
+            for b in state[light]}
 
 
 def test():
     b = bsuccessors3((frozenset([1]), frozenset([]), 0))
     assert b == {
-        (frozenset([]), frozenset([1]), 1): (set([1]), '->')}, b
+        (frozenset(), frozenset({1}), 1): ({1}, '->')}, b
 
     assert bsuccessors3((frozenset([1, 2]), frozenset([]), 0)) == {
-        (frozenset([1]), frozenset([2]), 1): (set([2]), '->'),
-        (frozenset([]), frozenset([1, 2]), 1): (set([1, 2]), '->'),
-        (frozenset([2]), frozenset([1]), 1): (set([1]), '->')}
+        (frozenset({1}), frozenset({2}), 1): ({2}, '->'),
+        (frozenset(), frozenset({1, 2}), 1): ({1, 2}, '->'),
+        (frozenset({2}), frozenset({1}), 1): ({1}, '->')}
 
     assert bsuccessors3((frozenset([2, 4]), frozenset([3, 5]), 1)) == {
-        (frozenset([2, 4, 5]), frozenset([3]), 0): (set([5]), '<-'),
-        (frozenset([2, 3, 4, 5]), frozenset([]), 0): (set([3, 5]), '<-'),
-        (frozenset([2, 3, 4]), frozenset([5]), 0): (set([3]), '<-')}
+        (frozenset({2, 4, 5}), frozenset({3}), 0): ({5}, '<-'),
+        (frozenset({2, 3, 4, 5}), frozenset({}), 0): ({3, 5}, '<-'),
+        (frozenset({2, 3, 4}), frozenset({5}), 0): ({3}, '<-')}
     return 'tests pass'
 
 
