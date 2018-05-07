@@ -1,4 +1,6 @@
 from collections import defaultdict
+import os
+import pathlib
 
 
 test_pattern = 'I need a ?X'
@@ -70,7 +72,7 @@ def pattern_match_l(pattern, input, bindings=None):
 
 
 def is_segment_pattern(pattern):
-    return is_tokens(pattern) and isinstance(pattern[0], tuple) and pattern[0][0].startswith('?*')
+    return is_tokens(pattern) and pattern[0].startswith('?*')
 
 
 def is_tokens(p_tokens):
@@ -79,7 +81,7 @@ def is_tokens(p_tokens):
 
 def segment_match(pattern, input, bindings=None, start=0):
     bindings = bindings or defaultdict(lambda : None)
-    var = pattern[0][1]
+    var = '?' + pattern[0].replace('?*', '')
     pat = pattern[1:]
 
     if len(pat) == 0:
@@ -110,13 +112,9 @@ def match_variable(var, input, bindings):
     return bindings
 
 
-def sub_list(variable_subsitude, words):
-    variable, subsitude = variable_subsitude
-    return [w if w != variable else subsitude for w in words]
-
-
-def get_bindings_pair(bindings_dict):
-    return bindings_dict.items()
+def sub_list(sub_dict, words):
+    r = [sub_dict.get(w, w) for w in words]
+    return r
 
 
 assert pattern_match(test_pattern.split(), test_input.split())
@@ -126,11 +124,10 @@ assert pattern_match_l('I need a ?X a really ?X'.split(), 'I need a vacation a r
 assert dict(pattern_match_l('I need a ?X a really ?X'.split(), 'I need a vacation a really vacation'.split())) == {'?X': 'vacation'}
 assert pattern_match_l('?X a really ?X'.split(), 'vacation a really ?X'.split()) is None
 assert ' '.join(sub_list(
-    *get_bindings_pair(
-        pattern_match_l('I need a ?X a really ?X'.split(),
-                        'I need a vacation a really vacation'.split())),
+    pattern_match_l('I need a ?X a really ?X'.split(),
+                    'I need a vacation a really vacation'.split()),
     'what would it mean to you if you got a ?X ?'.split())) == \
-    'what would it mean to you if you got a vacation ?'
+       'what would it mean to you if you got a vacation ?'
 
 assert dict(pattern_match_l('?X is ?X'.split(), '2 is 2'.split())) == {'?X': '2'}
 assert pattern_match_l('?X is ?X'.split(), '2 + 2 is 4'.split()) is None
@@ -140,18 +137,19 @@ assert dict(pattern_match_l(['?X', 'is', '?X'], ['2 + 2', 'is', '2 + 2'])) == {'
 r = pattern_match_l(['?P', 'need', '?X'], ['I', 'need', 'a', 'long', 'trip'])
 assert dict(r) == {'?P': 'I', '?X': 'a long trip'}, dict(r)
 
-r = pattern_match_l([('?*', '?P'), 'need', ('?*', '?X')], ['Mr', 'Hulot', 'and', 'I', 'need', 'a', 'vacation'])
+r = pattern_match_l(['?*P', 'need', '?*X'], ['Mr', 'Hulot', 'and', 'I', 'need', 'a', 'vacation'])
 assert dict(r) == {'?P': ['Mr', 'Hulot', 'and', 'I'], '?X': ['a', 'vacation']}, dict(r)
 
-r = pattern_match_l([('?*', '?x'), 'is', 'a', ('?*', '?y')],
+r = pattern_match_l(['?*x', 'is', 'a', '?*y'],
                     ['what', 'he', 'is', 'is', 'a', 'fool'])
 assert dict(r) == {'?x': ['what', 'he', 'is'],
                    '?y': ['fool']}, dict(r)
 
-r = pattern_match_l([('?*', '?x'), 'a', 'b', ('?*', '?x')],
+r = pattern_match_l(['?*x', 'a', 'b', '?*x'],
                     '1 2 a b a b 1 2 a b'.split())
 assert dict(r) == {'?x': ['1', '2', 'a', 'b']}, dict(r)
 
 print('test done!')
 
 
+print(os.path.isdir(os.path.join(pathlib.Path(os.path.abspath(__file__)).parent, 'data')))
