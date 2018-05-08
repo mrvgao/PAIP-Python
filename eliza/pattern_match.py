@@ -1,17 +1,12 @@
 from collections import defaultdict
-import os
-import pathlib
+from utilities import is_segment_pattern, is_variable, is_tokens, is_atom
+from utilities import cut
+from utilities import check_var_val
 
 
 test_pattern = 'I need a ?X'
 test_input = 'I need a vacation'
 test_n_input = 'I dont need a vacation'
-
-
-def is_atom(element): return isinstance(element, str) and ' ' not in element
-
-
-def is_variable(element): return is_atom(element) and element.startswith('?')
 
 
 def pattern_match(pattern, input):
@@ -53,7 +48,9 @@ fail = [True, None]
 
 
 def pattern_match_l(pattern, input, bindings=None):
+    # print('bindings', bindings)
     bindings = bindings or defaultdict(lambda : None)
+    # if len(pattern) == 0 or len(input) == 0: return None
     if bindings == fail: return None
     elif is_variable(pattern):
         return match_variable(pattern, input, bindings)
@@ -67,22 +64,16 @@ def pattern_match_l(pattern, input, bindings=None):
         return pattern_match_l(pattern[1:], input[1:],
                                bindings=pattern_match_l(peak_p, peak_input, bindings=bindings)
                 )
+    elif len(input) == 0 and len(pattern) != 0: return fail
     else:
         return bindings
-
-
-def is_segment_pattern(pattern):
-    return is_tokens(pattern) and pattern[0].startswith('?*')
-
-
-def is_tokens(p_tokens):
-    return isinstance(p_tokens, list) and len(p_tokens) > 0
 
 
 def segment_match(pattern, input, bindings=None, start=0):
     bindings = bindings or defaultdict(lambda : None)
     var = '?' + pattern[0].replace('?*', '')
     pat = pattern[1:]
+    # print('start', start)
 
     if len(pat) == 0:
         return match_variable(var, input, bindings)
@@ -90,18 +81,24 @@ def segment_match(pattern, input, bindings=None, start=0):
         pos = input[start:].index(pat[0]) if pat[0] in input[start:] else None
         if pos is None:
             return fail
-        else:
+        elif start+pos <= len(input) - 1:
             match_bindings = match_variable(var, input[:pos+start], bindings)
+            # check_var_val('pat', pat)
+            # check_var_val('input[start+pos:]', input[start+pos:])
             b2 = pattern_match_l(pat, input[start+pos:], match_bindings)
-            if b2 is None or b2 == fail:
+            # check_var_val('b2', b2)
+            if (start + pos + 1 < len(input)) and (b2 is None or b2 == fail):
                 bindings = defaultdict(lambda : None)
                 # when pattern_match_l for (pat, input[pos:], bindings) is None
                 # which means, the candidate suite match for mark after segment mark ?*
                 # is not fit for the total sub-pattern, then, we could let this be the ?* part
                 # and move forward to test if further sequence is okay.
+                # print('start+pos+1', start+pos+1)
                 return segment_match(pattern, input, bindings, start=start+pos+1)
             else:
                 return b2
+        else:
+            return fail
 
 
 def match_variable(var, input, bindings):
@@ -121,7 +118,11 @@ assert pattern_match(test_pattern.split(), test_input.split())
 assert not pattern_match(test_pattern.split(), test_n_input.split())
 assert pattern_match_l('I need a ?X a really ?X'.split(), 'I need a vacation a really trip'.split()) is None
 assert pattern_match_l('I need a ?X a really ?X'.split(), 'I need a vacation a really ?X'.split()) is None
-assert dict(pattern_match_l('I need a ?X a really ?X'.split(), 'I need a vacation a really vacation'.split())) == {'?X': 'vacation'}
+
+b = pattern_match_l('I need a ?X a really ?X'.split(), 'I need a vacation a really vacation'.split())
+# print(b)
+assert b == {'?X': 'vacation'}
+
 assert pattern_match_l('?X a really ?X'.split(), 'vacation a really ?X'.split()) is None
 assert ' '.join(sub_list(
     pattern_match_l('I need a ?X a really ?X'.split(),
@@ -149,7 +150,10 @@ r = pattern_match_l(['?*x', 'a', 'b', '?*x'],
                     '1 2 a b a b 1 2 a b'.split())
 assert dict(r) == {'?x': ['1', '2', 'a', 'b']}, dict(r)
 
+r = pattern_match_l(['我', '想', '?*y'], ['我'])
+assert r == fail
+
+r = pattern_match_l(cut('?*x我想?*y'), cut('然后我爸爸就骂我'))
+assert r == fail
+
 print('test done!')
-
-
-print(os.path.isdir(os.path.join(pathlib.Path(os.path.abspath(__file__)).parent, 'data')))
