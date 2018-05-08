@@ -99,7 +99,7 @@ def segment_match(pattern, input, bindings=None, start=0):
                 # which means, the candidate suite match for mark after segment mark ?*
                 # is not fit for the total sub-pattern, then, we could let this be the ?* part
                 # and move forward to test if further sequence is okay.
-                return segment_match(pattern, input, bindings, start=pos+1)
+                return segment_match(pattern, input, bindings, start=start+pos+1)
             else:
                 return b2
 
