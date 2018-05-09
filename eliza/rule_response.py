@@ -40,7 +40,6 @@ def compose_single_sentene(tree_words):
 if __name__ == '__main__':
     while True:
         sentence = input('USER >>>')
-        # sentence = '然后我爸爸就骂我'
         match = eliza(sentence)
         if match:
             print('{:>40}<<<'.format(concat(compose_single_sentene(match))))

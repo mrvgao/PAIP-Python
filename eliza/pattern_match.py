@@ -78,7 +78,8 @@ def segment_match(pattern, input, bindings=None, start=0):
     if len(pat) == 0:
         return match_variable(var, input, bindings)
     else:
-        pos = input[start:].index(pat[0]) if pat[0] in input[start:] else None
+        # pos = input[start:].index(pat[0]) if pat[0] in input[start:] else None
+        pos = first_match_pos(pat[0], input, start)
         if pos is None:
             return fail
         elif start+pos <= len(input) - 1:
@@ -99,6 +100,27 @@ def segment_match(pattern, input, bindings=None, start=0):
                 return b2
         else:
             return fail
+
+
+def first_match_pos(pat1, input, start):
+    if is_atom(pat1) and not is_variable(pat1):
+        pos = input[start:].index(pat1) if pat1 in input[start:] else None
+        return pos
+    elif start < len(input): return start
+    else:
+        return None
+
+
+def seg_match_one_or_more(pattern, input, bindings):
+    return segment_match(pattern, input, bindings, start=1)
+
+
+def seg_match_zero_or_one(pattern, input, bindings):
+    var = pattern[0][1]
+    pat = pattern[1:]
+    # change ??y to [?y + pat]
+    return pattern_match_l(['?{}'.format(var)] + pat, input, bindings) or \
+           pattern_match_l(pat, input, bindings)
 
 
 def match_variable(var, input, bindings):
