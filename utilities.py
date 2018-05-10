@@ -47,6 +47,12 @@ def assoc(var, alist):
     return None
 
 
+def change_index_of(L, index, new_value):
+    t = tuple if isinstance(L, tuple) else list
+    L = list(L)
+    return t(L[:index] + [new_value] + L[index+1:])
+
+
 concat = ''.join
 
 
@@ -92,33 +98,15 @@ def cut(string):
     return merge_variable(list(jieba.cut(string)))
 
 
-def check_var_val(var, var_value=None, global_=True):
-    if isinstance(var, str):
-        print('{} ::=> {}'.format(var, var_value))
-    else:
-        scope = globals if global_ else locals
-        k_v = first_if(list(scope().items()), lambda k_v: k_v[1] is var)
-        format_result = '{} ::=> {}'.format(k_v[0], var) if k_v else None
-        print(format_result)
-        return format_result
-
-
 if __name__ == '__main__':
     assert assoc(1, [(1, 1), (2, 2)]) == (1, 1)
     assert assoc(3, [(1, 1), (2, 2)]) is None
     assert every(lambda x: x > 0, [1, 2, 3])
     var_ = 'some var'
-    assert check_var_val(var_) == 'var_ ::=> some var', check_var_val(var_)
     var_3 = var_[:3]
-    assert check_var_val(var_3) == 'var_3 ::=> som'
 
-    def some_fun(var):
-        v = 1
-        assert check_var_val(v) is None
-        assert check_var_val(var) is None
-        assert check_var_val(v, global_=False) is not None
-        assert check_var_val(var, global_=False) is not None
-
-    some_fun(0)
+    assert change_index_of([1, 2, 3], 0, 0) == [0, 2, 3]
+    assert change_index_of([1, 2, 3], 2, 2) == [1, 2, 2]
+    assert change_index_of((1, 2, 3), 2, 2) == (1, 2, 2)
 
     print('test done!')
