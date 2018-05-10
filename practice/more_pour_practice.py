@@ -18,7 +18,6 @@
 # glass number.
 
 from utilities import change_index_of
-from itertools import permutations
 
 
 def find_capacity(goal):
