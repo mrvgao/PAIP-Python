@@ -48,9 +48,9 @@ def assoc(var, alist):
 
 
 def change_index_of(iterables, index, new_value):
-    t = tuple if isinstance(iterables, tuple) else list
-    iterables = list(iterables)
-    return t(iterables[:index] + [new_value] + iterables[index + 1:])
+    L = list(iterables)
+    L[index] = new_value
+    return type(iterables)(L)
 
 
 concat = ''.join

@@ -27,23 +27,25 @@ def find_capacity(goal):
 
 def psuccessors(capacities):
     def _successors(states):
-        action_states = []
         n = len(states)
-        action_states += [(('empty', i), change_index_of(states, i, 0)) for i in range(n)]
-        action_states += [(('fill', i), change_index_of(states, i, capacities[i])) for i in range(n)]
+        successors = {}
 
-        for i, j in permutations(range(n), r=2):
-            if states[i] + states[j] < capacities[j]:
-                new_state = change_index_of(states, j, states[i] + states[j])
-                new_state = change_index_of(new_state, i, 0)
-            else:
-                new_state = change_index_of(states, j, capacities[j])
-                new_state = change_index_of(new_state, i, states[i] + states[j] - capacities[j])
-            action_states.append((('pour', i, j), new_state))
+        for i in range(n):
+            successors[change_index_of(states, i, 0)] = ('empty', i)
+            successors[change_index_of(states, i, capacities[i])] = ('fill', i)
+            for j in range(n):
+                if j == i: continue
 
-        return {
-            state: action for action, state in action_states
-        }
+                amount = states[j] + states[i] if states[i] + states[j] < capacities[j] else capacities[j]
+                remain = 0 if states[i] + states[j] < capacities[j] else states[i] + states[j] - capacities[j]
+
+                new_state = change_index_of(states, j, amount)
+                new_state = change_index_of(new_state, i, remain)
+
+                successors[new_state] = ('pour', i, j)
+
+        return successors
+
     return _successors
 
 
