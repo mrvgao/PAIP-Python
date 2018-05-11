@@ -35,7 +35,7 @@ SOME_TEST_2 = 'SS'
 
 
 def test():
-    'some test fun'
+    'some format test'
     pass
 
 def neighbors(iterables, element):
