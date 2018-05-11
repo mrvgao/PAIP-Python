@@ -26,9 +26,13 @@
 # longest_ride() will be explicitly tested. If your code passes the
 # assert statements in test_ride(), it should be marked correct.
 
-from itertools import permutations
-from functools import reduce
 import operator as op
+from functools import reduce
+from itertools import permutations
+
+SOME_TEST = 'SS'
+SOME_TEST_1 = "SS"
+SOME_TEST_2 = 'SS'
 
 
 def neighbors(iterables, element):
