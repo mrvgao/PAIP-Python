@@ -3,7 +3,6 @@ facade = [[], [], []]
 
 class Rubic:
 
-
     def __init__(self, facade, facade_north, facade_south, facade_west, facade_east, facade_down):
         self.facade = facade
         self.north = facade_north
