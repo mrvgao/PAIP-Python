@@ -35,7 +35,7 @@ SOME_TEST_2 = 'SS'
 
 
 def test():
-    'some format pycharm test'
+    'some format auto pycharm-format test'
     pass
 
 def neighbors(iterables, element):
