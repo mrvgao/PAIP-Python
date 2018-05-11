@@ -34,7 +34,6 @@ SOME_TEST = 'SS'
 SOME_TEST_2 = 'SS'
 SOME_TEST_3 = 'SS'
 
-
 def test():
     'some format auto pycharm-format test'
     pass
