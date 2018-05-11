@@ -33,7 +33,10 @@ from itertools import permutations
 SOME_TEST = 'SS'
 SOME_TEST_2 = 'SS'
 
-def test(): pass
+
+def test():
+    'some test fun'
+    pass
 
 def neighbors(iterables, element):
     if element in iterables:
