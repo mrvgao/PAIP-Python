@@ -32,6 +32,7 @@ from itertools import permutations
 
 SOME_TEST = 'SS'
 SOME_TEST_2 = 'SS'
+SOME_TEST_3 = 'SS'
 
 
 def test():
