@@ -31,9 +31,9 @@ from functools import reduce
 from itertools import permutations
 
 SOME_TEST = 'SS'
-SOME_TEST_1 = "SS"
 SOME_TEST_2 = 'SS'
 
+def test(): pass
 
 def neighbors(iterables, element):
     if element in iterables:
