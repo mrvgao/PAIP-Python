@@ -18,6 +18,7 @@ def cut_rob(seg):
 options = {}
 
 
+@lru_cache(maxsize=1024)
 def cut_rob_with_mark(seg):
     if seg == 1 or seg == 0:
         return length_price[seg]
