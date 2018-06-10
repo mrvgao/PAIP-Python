@@ -30,13 +30,11 @@ import operator as op
 from functools import reduce
 from itertools import permutations
 
-SOME_TEST = 'SS'
-SOME_TEST_2 = 'SS'
-SOME_TEST_3 = 'SS'
 
 def test():
-    'some format auto pycharm-format test'
+    """some format auto pycharm-format test"""
     pass
+
 
 def neighbors(iterables, element):
     if element in iterables:
@@ -62,7 +60,7 @@ boston = subway(
 
 
 def ride(here, there, system=boston):
-    "Return a path on the subway system from here to there."
+    """Return a path on the subway system from here to there."""
 
     def arrive(s): return s == there
 
@@ -80,9 +78,11 @@ def longest_ride(system):
     """"Return the longest possible 'shortest path'
     ride between any two stops in the system."""
     all_states = set(reduce(op.add, system.values()))
-    trans_stations_num = lambda p: len(set(p[1::2]))
+
+    def _trans_stations_num(p): return len(set(p[1::2]))
+
     path = max([ride(here, there, system) for here, there in permutations(all_states, 2)],
-               key=lambda p: (len(path_states(p)), -trans_stations_num(p)))
+               key=lambda p: (len(path_states(p)), -_trans_stations_num(p)))
 
     return path
 
@@ -109,12 +109,12 @@ def shortest_path_search(start, successors, is_goal):
 
 
 def path_states(path):
-    "Return a list of states in this path."
+    """Return a list of states in this path."""
     return path[0::2]
 
 
 def path_actions(path):
-    "Return a list of actions in this path."
+    """Return a list of actions in this path."""
     return path[1::2]
 
 
